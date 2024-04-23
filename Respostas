@@ -1,0 +1,67 @@
+# 1) 
+import requests
+from bs4 import BeautifulSoup
+import pandas as pd
+
+url = "https://pt.wikipedia.org/wiki/Lista_do_BFI_com_os_50_filmes_que_voc%C3%AA_deveria_ver_at%C3%A9_os_14_anos"
+
+response = requests.get(url)
+content = response.content
+
+soup = BeautifulSoup(content, 'html.parser')
+
+filmes = []
+anos = []
+
+for element in soup.find_all('li'):
+    filme_info = element.get_text()
+    if '(' in filme_info:
+        filme, ano = filme_info.split('(')
+        filmes.append(filme.strip())
+        anos.append(ano.strip()[:-1])
+
+
+filmes.pop()
+anos.pop()
+
+df = pd.DataFrame({
+    'Nome': filmes,
+    'Ano': anos
+})
+
+df.loc[len(df)] = ['Total de Filmes:', len(df)]
+
+df.to_excel('filmes.xlsx', index=False)
+
+# 2)
+def fibonacci_recursivo(n):
+    if n <= 0:
+        return []
+    elif n == 1:
+        return [0]
+    elif n == 2:
+        return [0, 1]
+    else:
+        sequencia = fibonacci_recursivo(n - 1)  # Ajuste aqui
+        numero = sequencia[-1] + sequencia[-2]
+        sequencia.append(numero)
+        return sequencia[:n]  # Ajuste aqui
+
+n = 10
+resultado = fibonacci_recursivo(n)
+print(resultado)
+
+# Sem o erro:
+Após a correção, o código funciona corretamente.
+Ele gera a sequência de Fibonacci de forma recursiva, começando com [0, 1] como os dois primeiros números e,
+em seguida, adicionando o próximo número à sequência somando os dois últimos números. 
+A cada chamada recursiva, a função adiciona um novo número à sequência até atingir o número desejado n. 
+Em seguida, retorna a sequência resultante. O ajuste feito garante que a sequência final tenha exatamente n números, 
+como especificado pela variável n.
+
+# Com o erro:
+Com o erro original, a função fibonacci_recursivo estava definida para gerar a sequência de Fibonacci até n números,
+mas havia um problema na lógica de recursão. Na linha sequencia = fibonacci_recursivo(n - 2),
+a função estava sendo chamada com n - 2, o que resultava em uma sequência com dois números a menos do que o desejado.
+Por exemplo, se n fosse 10, a função chamaria fibonacci_recursivo(8) dentro de si mesma, 
+gerando uma sequência de Fibonacci com apenas 8 números. Isso levava a um descompasso entre a quantidade de números desejada (n) e a quantidade de números realmente gerada pela função.
